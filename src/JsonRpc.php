@@ -3,6 +3,7 @@
 namespace Esler;
 
 use GuzzleHttp\Client;
+use Esler\JsonRpc\Request;
 
 use function GuzzleHttp\json_decode;
 
@@ -16,14 +17,8 @@ class JsonRpc {
         $this->namespace = $namespace;
     }
 
-    public function call(string $method, array $params, string $id): \stdClass {
-        $response = $this->client->request('POST', '', [
-            'json' => [
-                'id'     => $id,
-                'method' => $this->namespace . $method,
-                'params' => $params,
-            ]
-        ]);
+    public function call(Request $request): \stdClass {
+        $response = $this->client->request('POST', '', ['json' => $request]);
 
         return json_decode($response->getBody()->getContents());
     }
@@ -33,7 +28,7 @@ class JsonRpc {
     }
 
     public function __call(string $name, array $params): \stdClass {
-        return $this->call($name, $params, $this->generateId());
+        return $this->call(new Request($this->namespace . $name, $params, $this->generateId()));
     }
 
     protected function generateId(): string {
