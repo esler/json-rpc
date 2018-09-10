@@ -17,7 +17,7 @@ class Error extends \Error
         return $this->data;
     }
 
-    public static function fromObject(object $object): Error
+    public static function fromObject(\stdClass $object): Error
     {
         return new Error($object->message, $object->code, $object->data ?? null);
     }
