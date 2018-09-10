@@ -8,21 +8,25 @@ class Response
     private $error;
     private $id;
 
-    public function __construct($result, ?Error $error, string $id) {
+    public function __construct($result, ?Error $error, string $id)
+    {
         $this->result = $result;
         $this->error = $error;
         $this->id = $id;
     }
 
-    public function getResult() {
+    public function getResult()
+    {
         return $this->result;
     }
 
-    public function getError(): ?Error {
+    public function getError(): ?Error
+    {
         return $this->error;
     }
 
-    public static function fromJson(string $json): Response {
+    public static function fromJson(string $json): Response
+    {
         if ($object = \json_decode($json)) {
             $error = isset($object->error) ? Error::fromObject($object->error) : null;
 
@@ -31,5 +35,4 @@ class Response
 
         throw new Exception(\json_last_error_msg());
     }
-
 }
