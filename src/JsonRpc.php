@@ -3,7 +3,9 @@
 namespace Esler;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Promise\RejectedPromise;
 use Esler\JsonRpc\Request;
 use Esler\JsonRpc\Response;
 
@@ -19,18 +21,28 @@ class JsonRpc {
         $this->namespace = $namespace;
     }
 
+    // Promise of Response
     public function send(Request $request): Promise {
-        $promise = $this->client->requestAsync('POST', '', ['json' => $request]);
-
-        return $promise->then(
-            function ($response) {
-                return Response::fromJson($response->getBody());
-            }
-        );
+        return $this->client->requestAsync('POST', '', ['json' => $request])
+            ->then(
+                function ($response) {
+                    return Response::fromJson($response->getBody());
+                }
+            );
     }
 
+    // Promise of Result (can be rejected)
     public function request(string $name, array $params=[], string $id=null): Promise {
-        return $this->send(new Request($name, $params, $id ?? $this->generateId()));
+        return $this->send(new Request($name, $params, $id ?? $this->generateId()))
+            ->then(
+                function (Response $response) {
+                    if ($error = $response->getError()) {
+                        return new RejectedPromise($error);
+                    }
+
+                    return new FulfilledPromise($response->getResult());
+                }
+            );
     }
 
     public function __get(string $name): JsonRpc {
@@ -38,13 +50,7 @@ class JsonRpc {
     }
 
     public function __call(string $name, array $params) {
-        $response = $this->request($this->namespace . $name, $params)->wait();
-
-        if ($error = $response->getError()) {
-            throw $error;
-        }
-
-        return $response->getResult();
+        return $this->request($this->namespace . $name, $params)->wait();
     }
 
     protected function generateId(): string {
