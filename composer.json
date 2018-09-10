@@ -1,4 +1,13 @@
 {
+    "name": "esler/json-rpc",
+    "description": "Simple async JSON-RPC library build on top of the GuzzleHttp",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ondrej Esler",
+            "email": "esler.ondrej@gmail.com"
+        }
+    ],
     "require": {
         "php": "^7.2",
         "ext-json": "*",
