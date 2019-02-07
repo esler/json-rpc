@@ -30,7 +30,9 @@ class Response
         if ($object = \json_decode($json)) {
             $error = isset($object->error) ? Error::fromObject($object->error) : null;
 
-            self::convertJsonClass($object->result);
+            if ($object->result) {
+                self::convertJsonClass($object->result);
+            }
 
             return new Response($object->result, $error, $object->id);
         }
@@ -38,9 +40,12 @@ class Response
         throw new Exception(\json_last_error_msg());
     }
 
-    private static function convertJsonClass(object &$result): void {
+    private static function convertJsonClass(&$result): void {
+        $isArray = is_array($result);
         foreach ($result as &$value) {
-            if (is_object($value) && isset($value->__jsonclass__)) {
+            if ($isArray) {
+                self::convertJsonClass($value);
+            } elseif (is_object($value) && isset($value->__jsonclass__)) {
                 switch ($value->__jsonclass__[0]) {
                     case 'datetime':
                         $value = new \DateTime($value->__jsonclass__[1], new \DateTimeZone('UTC'));
