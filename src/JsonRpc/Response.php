@@ -43,7 +43,7 @@ class Response
     private static function convertJsonClass(&$result): void {
         $isArray = is_array($result);
         foreach ($result as &$value) {
-            if ($isArray) {
+            if ($isArray && (is_object($value) || is_array($value))) {
                 self::convertJsonClass($value);
             } elseif (is_object($value) && isset($value->__jsonclass__)) {
                 switch ($value->__jsonclass__[0]) {

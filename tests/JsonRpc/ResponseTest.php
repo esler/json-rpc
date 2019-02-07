@@ -40,4 +40,15 @@ class ResponseTest extends TestCase
         }
     }
 
+    function testArrayOfStringsResult() {
+        $json = '{"id":123, "result": ["foo", "bar"]}';
+
+        $response = Response::fromJson($json);
+        $this->assertInstanceOf(Response::class, $response);
+
+        $result = $response->getResult();
+        $this->assertIsArray($result);
+        $this->assertSame(['foo', 'bar'], $result);
+    }
+
 }
