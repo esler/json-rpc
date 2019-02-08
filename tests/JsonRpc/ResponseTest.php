@@ -51,4 +51,14 @@ class ResponseTest extends TestCase
         $this->assertSame(['foo', 'bar'], $result);
     }
 
+    function testStringResult() {
+        $json = '{"id":123, "result": "Hello World"}';
+
+        $response = Response::fromJson($json);
+        $this->assertInstanceOf(Response::class, $response);
+
+        $result = $response->getResult();
+        $this->assertSame('Hello World', $result);
+    }
+
 }

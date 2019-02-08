@@ -40,17 +40,16 @@ class Response
         throw new Exception(\json_last_error_msg());
     }
 
-    private static function convertJsonClass(&$result): void {
-        $isArray = is_array($result);
-        foreach ($result as &$value) {
-            if ($isArray && (is_object($value) || is_array($value))) {
-                self::convertJsonClass($value);
-            } elseif (is_object($value) && isset($value->__jsonclass__)) {
-                switch ($value->__jsonclass__[0]) {
-                    case 'datetime':
-                        $value = new \DateTime($value->__jsonclass__[1], new \DateTimeZone('UTC'));
-                        break;
-                }
+    private static function convertJsonClass(&$value): void {
+        if (is_object($value) && isset($value->__jsonclass__)) {
+            switch ($value->__jsonclass__[0]) {
+                case 'datetime':
+                    $value = new \DateTime($value->__jsonclass__[1], new \DateTimeZone('UTC'));
+                    break;
+            }
+        } elseif (is_array($value) || is_object($value)) {
+            foreach ($value as &$val) {
+                self::convertJsonClass($val);
             }
         }
     }
