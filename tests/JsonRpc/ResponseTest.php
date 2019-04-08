@@ -61,4 +61,12 @@ class ResponseTest extends TestCase
         $this->assertSame('Hello World', $result);
     }
 
+    function testBinaryResult() {
+        $json = '{"id":123, "result": {"__jsonclass__": ["binary", "bm90aGluZw==\\n"]}}';
+
+        $response = Response::fromJson($json);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame('nothing', $response->getResult());
+    }
+
 }

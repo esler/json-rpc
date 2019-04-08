@@ -46,6 +46,9 @@ class Response
                 case 'datetime':
                     $value = new \DateTime($value->__jsonclass__[1], new \DateTimeZone('UTC'));
                     break;
+                case 'binary':
+                    $value = base64_decode($value->__jsonclass__[1], true);
+                    break;
             }
         } elseif (is_array($value) || is_object($value)) {
             foreach ($value as &$val) {
